@@ -1,0 +1,9 @@
+dataDir=/tmp/zookeeper
+clientPort=2181
+maxClientCnxns=0
+
+server.0=kafka_broker0.q:2181
+server.1=kafka_broker1.q:2181
+
+initLimit=5
+syncLimit=2

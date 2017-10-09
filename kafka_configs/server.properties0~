@@ -1,0 +1,4 @@
+broker.id=0
+num.partitions=4
+zookeeper.connect=kafka_broker0.q:2181,kafka_broker1.q:2181
+

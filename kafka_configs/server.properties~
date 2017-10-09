@@ -1,0 +1,4 @@
+broker.id=${BROKER_ID}
+num.partitions=4
+zookeeper.connect=${ZOOKEEPER_CONNECT}
+
