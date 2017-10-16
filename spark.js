@@ -1,6 +1,7 @@
 const {PortRange, Container, allow, publicInternet } = require('@quilt/quilt');
 
-let image = 'mchang6137/spark-yahoo';
+let master_image = 'mchang6137/spark-yahoo-master';
+let worker_image = 'mchang6137/spark-yahoo-worker';
 
 /**
  * Change the Spark Docker image used to run the cluster.
@@ -25,7 +26,7 @@ function getHostname(c) {
  * Spark masters.
  */
 function Spark(nMaster, nWorker, zookeeper) {
-    const refMaster = new Container('spark-ms', image, {
+    const refMaster = new Container('spark-ms', master_image, {
 	command: ['run', 'master'],
 	env: {SPARK_MASTER_WEBUI_PORT : '7654'},
     });
@@ -40,7 +41,7 @@ function Spark(nMaster, nWorker, zookeeper) {
     }
 
     const masterHosts = this.masters.map(getHostname);
-    const refWorker = new Container('spark-wk', image, {
+    const refWorker = new Container('spark-wk', worker_image, {
 	command: ['run', 'worker'],
 	env: {
 	    MASTERS: masterHosts.join(','),
