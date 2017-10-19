@@ -1,24 +1,40 @@
 const {PortRange, publicInternet, createDeployment, Machine, Range, githubKeys, LabelRule, MachineRule} = require("@quilt/quilt");
+const utils = require('./utils.js');
 
 var Redis = require("./redis.js");
 var Kafka = require("./kafka.js");
 var SparkStreaming = require("./spark.js");
 var SendKafka = require("./spark_streaming.js");
 
+send_events_instance = 'c4.xlarge';
+worker_instance = 'm4.large';
+
 var namespace = createDeployment({namespace:"mchang6137-kafka"});
 var baseMachine = new Machine({
-    size: "m4.large",
+    size: worker_instance,
     provider: "Amazon",
-    sshKeys: githubKeys("mchang6137"),
 });
+
+var generatorMachine = new Machine({
+    size: send_events_instance,
+    provider: "Amazon",
+});
+
+utils.addSshKey(baseMachine)
+utils.addSshKey(generatorMachine)
 
 namespace.deploy(baseMachine.asMaster());
 namespace.deploy(baseMachine.asWorker().replicate(8));
 
 var send_events = new SendKafka(1);
 var redis = new Redis(1, 'no_pass');
-var kafka = new Kafka(2);
-var spark = new SparkStreaming.Spark(1, 2)
+var kafka = new Kafka(1);
+var spark = new SparkStreaming.Spark(1, 4)
+
+send_events.placeOn({size: send_events_instance});
+redis.placeOn({size: worker_instance});
+kafka.placeOn({size: worker_instance});
+spark.placeOn({size: worker_instance});
 
 spark.debug();
 spark.exposeUIToPublic();
@@ -39,8 +55,6 @@ redis.connect(new PortRange(1, 65535), kafka);
 send_events.connect(new PortRange(1, 65535), redis);
 send_events.connect(new PortRange(1, 65535), kafka);
 send_events.connect(new PortRange(1, 65535), spark);
-
-//Explicit Opening of ports -- made redundant since we just open all ports between containers anyways
 
 namespace.deploy(kafka);
 namespace.deploy(redis);
