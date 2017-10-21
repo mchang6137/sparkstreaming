@@ -76,7 +76,9 @@ function Spark(nMaster, nWorker, zookeeper) {
 	allow(publicInternet, this.masters, 8080);
 	allow(publicInternet, this.workers, 8081);
 	allow(publicInternet, this.workers, 7654);
-	allow(publicInternet, this.masters, 7654)
+	allow(publicInternet, this.masters, 7654);
+	allow(publicInternet, this.masters, 4040);
+	allow(publicInternet, this.workers, 4040);
 
 	allow(this.workers, publicInternet, 7654);
 	allow(this.masters, publicInternet, 7654)
