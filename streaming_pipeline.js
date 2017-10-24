@@ -9,14 +9,16 @@ var SendKafka = require("./spark_streaming.js");
 send_events_instance = 'c4.xlarge';
 worker_instance = 'm4.large';
 
-var namespace = createDeployment({namespace:"mchang6137-streaming"});
+var namespace = createDeployment({namespace:"mchang6137-streaming252a"});
 var baseMachine = new Machine({
     size: worker_instance,
+    region: 'us-west-1',
     provider: "Amazon",
 });
 
 var generatorMachine = new Machine({
     size: send_events_instance,
+    region: 'us-west-1',
     provider: "Amazon",
 });
 
@@ -26,7 +28,7 @@ utils.addSshKey(generatorMachine)
 num_senders = 2
 namespace.deploy(baseMachine.asMaster());
 namespace.deploy(generatorMachine.asWorker().replicate(num_senders));
-namespace.deploy(baseMachine.asWorker().replicate(8));
+namespace.deploy(baseMachine.asWorker().replicate(5));
 
 var send_events = new SendKafka(num_senders);
 var redis = new Redis(1, 'no_pass');
@@ -56,11 +58,11 @@ for (var index=0; index < spark.workers.length; index++) {
     spark.workers[index].placeOn({size: worker_instance});
 }
 
-spark.debug();
+//spark.debug();
 spark.exposeUIToPublic();
-kafka.debug();
-redis.debug();
-send_events.debug()
+//kafka.debug();
+//redis.debug();
+//send_events.debug()
 
 //Open up all ports between the containers
 spark.connect(new PortRange(1, 65535), redis);
