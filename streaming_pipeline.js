@@ -7,7 +7,7 @@ var SparkStreaming = require("./spark.js");
 var SendKafka = require("./spark_streaming.js");
 
 send_events_instance = 'c4.xlarge';
-worker_instance = 'm4.large';
+worker_instance = 'm4.2xlarge';
 
 var namespace = createDeployment({namespace:"mchang6137-streaming252a"});
 var baseMachine = new Machine({
@@ -28,12 +28,12 @@ utils.addSshKey(generatorMachine)
 num_senders = 2
 namespace.deploy(baseMachine.asMaster());
 namespace.deploy(generatorMachine.asWorker().replicate(num_senders));
-namespace.deploy(baseMachine.asWorker().replicate(5));
+namespace.deploy(baseMachine.asWorker().replicate(4));
 
 var send_events = new SendKafka(num_senders);
 var redis = new Redis(1, 'no_pass');
 var kafka = new Kafka(2);
-var spark = new SparkStreaming.Spark(1, 4)
+var spark = new SparkStreaming.Spark(1, 3)
 
 for (var index=0; index < send_events._members.length; index++) {
     send_event_c = send_events._members[index];
